@@ -1,0 +1,335 @@
+"""
+Problem 1: Let A be the set 𝑨 = {𝟏,𝟐, 𝟑,𝟒}. Write a program to find the ordered pairs
+are in the relation
+I) 𝑅1 = {(𝑎, 𝑏) | 𝑎 𝑑𝑖𝑣𝑖𝑑𝑒𝑠 𝑏} II) 𝑅2 = {(𝑎, 𝑏) | 𝑎 ≤ 𝑏}.
+"""
+from itertools import product
+S = [1, 2, 3, 4]
+R = list()
+R1 = list()
+R2 = list()
+
+for i in S:
+    for j in S:
+        R.append((i, j))
+        if j % i == 0:
+            R1.append((i, j))
+        if i <= j:
+            R2.append((i, j))
+
+print("S = " + str(S))
+print("R = " + str(R))
+print("R1 = " + str(R1))
+print("R2 = " + str(R2))
+
+
+
+"""
+Problem 2: Suppose that 𝐴 = {1, 2, 3} and 𝐵 = {1, 2}. Let R be the relation from A to B containing (a, b) if
+𝑎 ∈ 𝐴, 𝑏 ∈ 𝐵, and 𝑎 > 𝑏. Write a program to find the relation R and also represent this relation
+in matrix form if 𝑎1 = 1, 𝑎2 = 2, and 𝑎3 = 3, and 𝑏1 = 1 and 𝑏2 = 2.
+"""
+import numpy as np
+A = [1, 2, 3]
+B = [1, 2]
+R = list()
+Matrix1 = list()
+for i in A:
+    for j in B:
+        if i > j:
+            R.append((i, j))
+            Matrix1.append(1)
+        else:
+            Matrix1.append(0)
+Matrix2 = np.array(Matrix1).reshape(3, 2)
+print("R: " + str(R))
+print("Matrix: \n" + str(Matrix2))
+
+
+"""
+Problem 3: Write a program for the solution of graph coloring problem by Welch Powell’s algorithm.
+"""
+
+
+def color_graph(arg_graph):
+    nodes = sorted(arg_graph.keys(), key=lambda x: len(arg_graph[x]), reverse=True)
+    color_map = {}
+    for node in nodes:
+        neighbor_colors = set(color_map.get(neigh) for neigh in arg_graph[node])
+        color_map[node] = next(color for color in range(len(arg_graph[node])) if color not in neighbor_colors)
+    return color_map
+
+
+if __name__ == '__main__':
+    graph = {
+        'A': list("CE"),
+        'B': list("ECD"),
+        'C': list("ABD"),
+        'D': list("CBE"),
+        'E': list("ABD")
+    }
+    print(color_graph(graph))
+
+"""
+Problem 4: Write a program to find shortest path by Warshall’s algorithm.
+Illustration of the problem
+"""
+
+INF = 1000
+vr = 4
+
+
+def floyd_warshall(vertex, adjacence_matrix):
+    for k in range(vertex):
+        for i in range(vertex):
+            for j in range(vertex):
+                adjacence_matrix[i][j] = min(adjacence_matrix[i][j], adjacence_matrix[i][k] + adjacence_matrix[k][j])
+
+    for i in range(vertex):
+        for j in range(vertex):
+            if adjacence_matrix[i][j] == INF:
+                print("INF", end='\t')
+            else:
+                print((adjacence_matrix[i][j]), end='\t')
+        print()
+
+
+a_m = [
+    [0, 5, INF, 10],
+    [INF, 0, 3, INF],
+    [INF, INF, 0, 1],
+    [INF, INF, INF, 0]
+]
+floyd_warshall(vr, a_m)
+
+"""
+problem 5: Suppose that the relations R1 and R2 on a set A are represented by the matrices.
+ Write a program to find the MR1∪R2 and MR1∩R2.
+"""
+
+import numpy as np
+
+m1 = [
+    [1, 1, 1],
+    [1, 0, 1],
+    [0, 1, 0]
+]
+m2 = [
+    [1, 0, 1],
+    [0, 1, 1],
+    [1, 0, 0]
+]
+
+u_m = [m1[i][j] or m2[i][j] for i in range(len(m1)) for j in range(len(m1[0]))]
+i_m = [m1[i][j] and m2[i][j] for i in range(len(m1)) for j in range(len(m1[0]))]
+
+print("Matrix intersection: ")
+print(np.array(i_m).reshape(3, 3))
+print("Matrix union: ")
+print(np.array(u_m).reshape(3, 3))
+
+
+"""
+Problem 6: The following table gives the population of a town during the last six censuses. Write a program
+to find the population in the year of 1946 using Newton-Gregory forward interpolation
+formula
+"""
+import numpy as np
+
+x = [1911, 1921, 1931, 1941, 1951, 1961]
+y = [12, 15, 20, 27, 39, 52]
+n = 1946
+t = float((n-x[0]) / (x[1] - x[0]))
+sum = y[0]
+coef = t
+k = 1
+for i in range(len(y), 1, - 1):
+    y = np.diff(y)
+    sum += coef * y[0]
+    coef = coef * (t-k) / (k+1)
+    k += 1
+print(sum)
+
+
+"""
+problem 7: Write a program to find f(7.5) form the following table using Newton-Gregory backward
+interpolation formula.
+
+"""
+
+import numpy as np
+
+x = [1, 2, 3, 4, 5, 6, 7, 8]
+y = [1, 8, 27, 64, 125, 216, 343, 512]
+
+point = 7.5
+n = len(x)-1
+t = (7.5 - x[n]) / (x[1] - x[0])
+coef = t
+k = 1
+sum = y[n]
+for i in range(n, 1, -1):
+    y = np.diff(y)
+    sum = sum + coef*y[i-1]
+    coef = coef * (k+t) / (k+1)
+    k += 1
+print(sum)
+
+
+"""
+Problem 8: Write a Python program to find the value of 𝐟(𝟏𝟓) from the following table
+using Newton’s divided difference formula.
+"""
+# Newton divided difference formula
+
+# Function to find the product term
+def proterm(i, value, x):
+    pro = 1
+    for j in range(i):
+        pro = pro * (value - x[j])
+    return pro
+
+
+# Function for calculating
+# divided difference table
+def dividedDiffTable(x, y, n):
+    for i in range(1, n):
+        for j in range(n - i):
+            y[j][i] = ((y[j][i - 1] - y[j + 1][i - 1]) /
+                       (x[j] - x[i + j]))
+    return y
+
+
+# Function for applying Newton's
+# divided difference formula
+def applyFormula(value, x, y, n):
+    sum = y[0][0]
+
+    for i in range(1, n):
+        sum = sum + (proterm(i, value, x) * y[0][i])
+
+    return sum
+
+
+# Function for displaying divided
+# difference table
+def printDiffTable(y, n):
+    for i in range(n):
+        for j in range(n - i):
+            print(round(y[i][j], 4), "\t",
+                  end=" ")
+
+        print("")
+
+
+# Driver Code
+
+# number of inputs given
+n = 6
+y = [[0 for i in range(10)]
+     for j in range(10)]
+x = [4, 5, 7, 10, 11, 13]
+
+# y[][] is used for divided difference
+# table where y[][0] is used for input
+y[0][0] = 48
+y[1][0] = 100
+y[2][0] = 294
+y[3][0] = 900
+y[4][0] = 1210
+y[5][0] = 2028
+
+# calculating divided difference table
+y = dividedDiffTable(x, y, n)
+
+# displaying divided difference table
+printDiffTable(y, n)
+
+# value to be interpolated
+value = 15
+
+# printing the value
+print("\nValue at", value, "is",
+      round(applyFormula(value, x, y, n), 2))
+
+
+
+
+"""
+Problem 9: Write a Python program to find the value of y when 𝐱 = 𝟏𝟎 from the
+following table using Lagrange’s interpolation formula.
+"""
+
+x = [5, 6, 9, 11]
+y = [12, 13, 14, 16]
+value = 10
+sum = 0
+n = len(x)
+for i in range(n):
+    p = 1
+    for j in range(n):
+        if i != j:
+            p =p* (value - x[j]) / (x[i] - x[j])
+    sum = sum + p * y[i]
+print(round(sum, 4))
+
+
+"""
+Problem 10: Write a Python program to find a real root of the equation
+using bisection method.
+"""
+
+def func(x):
+    return x * x - 4 * x - 10
+
+
+def bisection(a, b):
+    if func(a) * func(b) >= 0:
+        print("You have not assumed right a and b\n")
+        return
+    c = a
+    while (b - a) >= 0.00001:
+        c = (a + b) / 2
+        if (func(c) == 0.0):
+            break
+        if (func(c) * func(a) < 0):
+            b = c
+        else:
+            a = c
+    print("The value of root is : ", "%.4f" % c)
+
+
+a = -2
+b = -1.5
+bisection(a, b)
+
+
+
+"""
+Problem 11: Write a Python program to find a real root of the equation
+using false position method.
+"""
+
+def f(x):
+    return x * x - x - 2
+
+
+def falsi(a, b):
+    if f(a) * f(b) >= 0:
+        print("a and b is not valid")
+        return
+    for i in range(100000):
+        c = (a * f(b) - b * f(a)) / (f(b) - f(a))
+        if f(c) == 0:
+            break
+        if f(a) * f(c) < 0:
+            b = c
+        else:
+            a = c
+    print(f"The root is {round(c, 4)}")
+
+
+a = 1
+b = 3
+falsi(a, b)
+
